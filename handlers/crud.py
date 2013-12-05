@@ -45,18 +45,40 @@ class NewPatientHandler(webapp2.RequestHandler):
 	    patient.history    = self.request.get('p_history')
 
 	    if patient.enrolled_by:
-	    	patient.last_mod = patient.enrolled_by
+	    	patient.last_mod_by = patient.enrolled_by
 	    else:
-	    	patient.last_mod = users.get_current_user()
+	    	patient.last_mod_by = users.get_current_user()
 
 	    if patient.created:
-	    	patient.last_update = patient.created
+	    	patient.last_updated = patient.created
 	    else:
-	    	patient.last_update = datetime.datetime.now()
+	    	patient.last_updated = datetime.datetime.now()
 
 		patient.put()
 		
 		self.redirect('/')
+
+	def get(self, patient_id):
+		logging.debug("Inside patient create get method")
+		id = int(patient_id)
+		patient = PatientById(id)
+
+		template_values = {
+			'p_name':           patient.name,
+			'p_id_no':          patient.id_no,
+			'p_gender':         patient.gender,
+			'p_record_no':      patient.record_no,
+			'p_birth_date':     patient.birth_date,
+			'p_cell_no':        patient.cell_no,
+		    'p_mugshot':        patient.mugshot,
+		    'p_email':          patient.email,
+		    'p_employer':       patient.employer,
+		    'p_history':        patient.history,
+		    'p_enrolled_by':    patient.enrolled_by,
+			}
+
+		template = JINJA_ENVIRONMENT.get_template('new_p.html')
+		self.response.write(template.render(template_values))
 
 
 class NewConsultationHandler(webapp2.RequestHandler):
@@ -97,16 +119,16 @@ class EditPatientHandler(webapp2.RequestHandler):
 		patient = PatientById(id)
 
 		template_values = {
-			'p_name':       patient.name
-			'p_id_no':      patient.id_no
-			'p_gender':     patient.gender
-			'p_record_no':  patient.record_no
-			'p_birth_date': patient.birth_date
-			'p_cell_no':    patient.cell_no
-		    'p_mugshot':    patient.mugshot
-		    'p_email':      patient.email
-		    'p_employer':   patient.employer
-		    'p_history':    patient.history
+			'p_name':       patient.name,
+			'p_id_no':      patient.id_no,
+			'p_gender':     patient.gender,
+			'p_record_no':  patient.record_no,
+			'p_birth_date': patient.birth_date,
+			'p_cell_no':    patient.cell_no,
+		    'p_mugshot':    patient.mugshot,
+		    'p_email':      patient.email,
+		    'p_employer':   patient.employer,
+		    'p_history':    patient.history,
 			}
 
 		template = JINJA_ENVIRONMENT.get_template('edit_p.html')
@@ -140,10 +162,10 @@ class EditConsultationHandler(webapp2.RequestHandler):
 		con = ConsultationById(id)
 
 		template_values = {     
-			'c_type':      con.consultation_type           
-			'c_date':      con.consultation_date 
-			'c_completed': con.completed         
-			'c_price':     con.price             
+			'c_type':      con.consultation_type,
+			'c_date':      con.consultation_date,
+			'c_completed': con.completed,
+			'c_price':     con.price,        
 			}
 
 		template = JINJA_ENVIRONMENT.get_template('edit_c.html')
@@ -162,3 +184,43 @@ class EditConsultationHandler(webapp2.RequestHandler):
 		con.put()
 
 		self.redirect('/')
+
+class DisplayConsultationHandler(webapp2.RequestHandler):
+	def get(self, consultation_id):
+		logging.debug("Inside consultation edit get method")
+		id = int(consultation_id)
+		con = ConsultationById(id)
+
+		template_values = {     
+			'c_type':      con.consultation_type,
+			'c_date':      con.consultation_date,
+			'c_completed': con.completed,
+			'c_price':     con.price,
+			}
+
+		template = JINJA_ENVIRONMENT.get_template('edit_c.html')
+		self.response.write(template.render(template_values))
+
+
+class DisplayPatientHandler(webapp2.RequestHandler):
+	def get(self, patient_id):
+		logging.debug("Inside patient display get method")
+		id = int(patient_id)
+		patient = PatientById(id)
+
+		template_values = {
+			'p_name':           patient.name,
+			'p_id_no':          patient.id_no,
+			'p_gender':         patient.gender,
+			'p_record_no':      patient.record_no,
+			'p_birth_date':     patient.birth_date,
+			'p_cell_no':        patient.cell_no,
+		    'p_mugshot':        patient.mugshot,
+		    'p_email':          patient.email,
+		    'p_employer':       patient.employer,
+		    'p_history':        patient.history,
+		    'p_enrolled_by':    patient.enrolled_by,
+			}
+
+		template = JINJA_ENVIRONMENT.get_template('edit_p.html')
+		self.response.write(template.render(template_values))
